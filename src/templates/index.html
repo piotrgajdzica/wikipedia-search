@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>test1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script
+  src="http://code.jquery.com/jquery-2.1.4.min.js"
+  integrity="sha256-8WqyJLuWKRBVhxXIL1jBDD7SDxU936oZkCnxQbWwJVw="
+  crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+  <style>
+    #imaginary_container{
+    margin-top:20%; /* Don't copy this */
+}
+.stylish-input-group .input-group-addon{
+    background: white !important; 
+}
+.stylish-input-group .form-control{
+	border-right:0; 
+	box-shadow:0 0 0; 
+	border-color:#ccc;
+}
+.stylish-input-group button{
+    border:0;
+    background:transparent;
+}
+a {font-size: 200%}
+
+.svd_button button {
+padding: 0;
+border: none;
+background: none;
+font-size: 150%;
+}
+
+.button-link{
+
+    visibility: hidden;
+    font-size: 150%;
+}
+
+
+
+</style>
+</head>
+<body>
+
+<script>
+function svd(k){
+	var dataToSend = k + " " + document.getElementById('searchBox').value;
+	var jqXHR = $.ajax({
+	type: "POST",
+	url: "/svd",
+	data: {mydata: dataToSend}, //passing some input here
+	success: function(response){
+		var data = JSON.parse(response);
+		for (i = 1; i <= 10; i++) { 
+                document.getElementById("res" + i.toString()).value = data.result[i-1][0]
+                document.getElementById('but' + i.toString()).innerHTML = data.result[i-1][1];
+                document.getElementById('but' + i.toString()).style.visibility = 'visible';
+		}	
+		
+	}
+	}).done(function(resp){
+		console.log(resp);
+	}).error(function (xhr, ajaxOptions, thrownError) {
+		console.log(xhr.status);
+		console.log(thrownError);
+	});
+	
+}
+
+function search(e) {
+	
+	
+	if(e){
+	
+		if(e.keyCode === 13){
+			postData();
+		}
+	}
+	else{
+		postData();
+	}
+}
+	
+
+	
+function postData(input) {
+		var dataToSend = document.getElementById('searchBox').value;
+	    var jqXHR = $.ajax({
+        type: "POST",
+        url: "/nosvd",
+        data: {mydata: dataToSend}, //passing some input here
+        success: function(response){
+
+            for (i = 1; i <= 10; i++) {
+                document.getElementById('but' + i.toString()).style.visibility = 'hidden';
+			}
+
+			var data = JSON.parse(response);
+			for (i = 1; i <= 10; i++) {
+
+                document.getElementById("res" + i.toString()).value = data.result[i-1][0]
+                document.getElementById('but' + i.toString()).innerHTML = data.result[i-1][1];
+                document.getElementById('but' + i.toString()).style.visibility = 'visible';
+			}
+			
+        }
+		}).done(function(resp){
+			console.log(resp);
+		}).error(function (xhr, ajaxOptions, thrownError) {
+			console.log(xhr.status);
+			console.log(thrownError);
+		});
+}
+</script>
+
+  
+<div class="container">
+	<div class="row">
+	
+  
+	
+
+        <div class="col-sm-10">
+			<h1><center>Wikipedia article search</center></h1>
+                <div class="input-group stylish-input-group">
+                    <input id="searchBox" type="text" class="form-control"  placeholder="Search" onkeypress="search(event)">
+                    <span class="input-group-addon">
+                        <button type="submit" onclick="search();">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>  
+                    </span>
+            </div>
+        </div>
+		<div class="col-md-2">
+			<h1><center><br></center></h1>
+			<div class="dropdown">
+				<button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">SVD
+				<span class="caret"></span></button>
+				<ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+				<span class="svd_button">
+      <li role="presentation"><button class="dropdown-item" type="submit" onclick="svd(10);">k = 10</button>  </li>
+	  <li role="presentation"><button class="btn btn-default"type="submit" onclick="svd(20);">k = 20</button>  </li>
+	  <li role="presentation"><button class="btn btn-default"type="submit" onclick="svd(40);">k = 40</button>  </li>
+	  <li role="presentation"><button class="btn btn-default"type="submit" onclick="svd(70);">k = 70</button>  </li>
+	  <li role="presentation"><button class="btn btn-default"type="submit" onclick="svd(100);">k = 100</button>  </li>
+	  <li role="presentation"><button class="btn btn-default"type="submit" onclick="svd(150);">k = 150</button>  </li>
+	  <li role="presentation"><button class="btn btn-default"type="submit" onclick="svd(200);">k = 200</button>  </li>
+	  </span>
+	</ul>
+			</div>
+		</div>
+	</div>
+	<br>
+	<div align="center">
+	<form action="/file" method="get" target="_blank"> <input id="res1" type="hidden" name="filename"  value=""><br>
+    <button class="btn btn-primary button-link" id="but1" type="submit" formmethod="post">Submit using POST</button>
+    </form><form action="/file" method="get" target="_blank"> <input id="res2" type="hidden" name="filename"  value=""><br>
+    <button class="btn btn-primary button-link" id="but2" type="submit" formmethod="post">Submit using POST</button>
+    </form><form action="/file" method="get" target="_blank"> <input id="res3" type="hidden" name="filename"  value=""><br>
+    <button class="btn btn-primary button-link" id="but3" type="submit" formmethod="post">Submit using POST</button>
+    </form><form action="/file" method="get" target="_blank"> <input id="res4" type="hidden" name="filename"  value=""><br>
+    <button class="btn btn-primary button-link" id="but4" type="submit" formmethod="post">Submit using POST</button>
+    </form><form action="/file" method="get" target="_blank"> <input id="res5" type="hidden" name="filename"  value=""><br>
+    <button class="btn btn-primary button-link" id="but5" type="submit" formmethod="post">Submit using POST</button>
+    </form><form action="/file" method="get" target="_blank"> <input id="res6" type="hidden" name="filename"  value=""><br>
+    <button class="btn btn-primary button-link" id="but6" type="submit" formmethod="post">Submit using POST</button>
+    </form><form action="/file" method="get" target="_blank"> <input id="res7" type="hidden" name="filename"  value=""><br>
+    <button class="btn btn-primary button-link" id="but7" type="submit" formmethod="post">Submit using POST</button>
+    </form><form action="/file" method="get" target="_blank"> <input id="res8" type="hidden" name="filename"  value=""><br>
+    <button class="btn btn-primary button-link" id="but8" type="submit" formmethod="post">Submit using POST</button>
+    </form><form action="/file" method="get" target="_blank"> <input id="res9" type="hidden" name="filename"  value=""><br>
+    <button class="btn btn-primary button-link" id="but9" type="submit" formmethod="post">Submit using POST</button>
+    </form><form action="/file" method="get" target="_blank"> <input id="res10" type="hidden" name="filename"  value=""><br>
+    <button class="btn btn-primary button-link" id="but10" type="submit" formmethod="post">Submit using POST</button>
+    </form>
+    </div>
+	
+</div>
+
+
+</body>
+</html>
